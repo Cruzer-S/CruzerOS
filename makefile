@@ -7,9 +7,15 @@ LD = arm-none-eabi-ld
 OC = arm-none-eabi-objcopy
 
 LINKER_SCRIPT = ./cruzeros.ld
+MAP_FILE = build/cruzeros.map
 
 ASM_SRCS = $(wildcard boot/*.S)
-ASM_OBJS = $(patsubst boot/%.S, build/%.o, $(ASM_SRCS))
+ASM_OBJS = $(patsubst boot/%.S, build/%.os, $(ASM_SRCS))
+
+C_SRCS = $(wildcard boot/*.c)
+C_OBJS = $(patsubst boot/%.c, build/%.o, $(C_SRCS))
+
+INC_DIRS = -I include
 
 cruzeros = build/cruzeros.axf
 cruzeros_bin = build/cruzeros.bin
@@ -30,10 +36,15 @@ debug: $(cruzeros)
 gdb:
 	arm-none-eabi-gdb
 
-$(cruzeros): $(ASM_OBJS) $(LINKER_SCRIPT)
-	$(LD) -n -T $(LINKER_SCRIPT) -o $(cruzeros) $(ASM_OBJS)
+$(cruzeros): $(ASM_OBJS) $(C_OBJS) $(LINKER_SCRIPT)
+	$(LD) -n -T $(LINKER_SCRIPT) -o $(cruzeros) $(ASM_OBJS) \
+		$(C_OBJS) -Map=$(MAP_FILE)
 	$(OC) -O binary $(cruzeros) $(cruzeros_bin)
 
-build/%.o: boot/%.S
+build/%.os: $(ASM_SRCS)
 	mkdir -p $(shell dirname $@)
-	$(AS) -march=$(ARCH) -mcpu=$(MCPU) -g -o $@ $<
+	$(CC) -mcpu=$(MCPU) $(INC_DIRS) -c -g -o $@ $<
+
+build/%.o: $(C_SRCS)
+	mkdir -p $(shell dirname $@)
+	$(CC) -mcpu=$(MCPU) $(INC_DIRS) -c -g -o $@ $<
