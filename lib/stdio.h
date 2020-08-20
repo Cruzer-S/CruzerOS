@@ -3,6 +3,8 @@
 
 #include "stdarg.h"
 
+#define NULL	(0)
+
 typedef enum utoa_t
 {
 	utoa_dec = 10,

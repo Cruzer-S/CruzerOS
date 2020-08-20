@@ -1,7 +1,9 @@
 #include "stdint.h"
-#include "hal_uart.h"
-
 #include "stdio.h"
+#include "stdbool.h"
+
+#include "hal_uart.h"
+#include "hal_interrupt.h"
 
 static void hw_init(void);
 static void print_test(void);
@@ -20,15 +22,12 @@ void main(void)
 
 	print_test();
 
-	i = 100;
-	while ( i-- ) {
-		uint8_t ch = hal_uart_get_char();
-		hal_uart_put_char(ch);
-	}
+	while (true) ;
 }
 
 static void hw_init(void)
 {
+	hal_interrupt_init();
 	hal_uart_init();
 }
 
@@ -44,4 +43,5 @@ static void print_test(void)
 	debug_printf("%u = 5 \n", i);
 	debug_printf("dec = %u hex = %x \n", 0xff, 0xff);
 	debug_printf("print zero %u \n", 0);
+
 }
