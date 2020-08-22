@@ -5,7 +5,11 @@
 #include "task.h"
 
 static kernel_tcb_t task_list[MAX_TASK_NUM];
+
 static uint32_t		allocated_tcb_index;
+static uint32_t		current_tcb_index;
+
+static kernel_tcb_t *scheduler_round_robin_algorithm(void);
 
 void kernel_task_init(void)
 {
@@ -42,4 +46,12 @@ uint32_t kernel_task_create(kernel_task_func_t start_func)
 	ctx->pc = (uint32_t)start_func;
 
 	return (allocated_tcb_index - 1);
+}
+
+static kernel_tcb_t scheduler_round_robin_algorithm(void)
+{
+	current_tcb_index++;
+	current_tcb_index %= allocated_tcb_index;
+
+	return &task_list[current_tcb_index];
 }
