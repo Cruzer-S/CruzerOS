@@ -8,10 +8,17 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+#include "task.h"
+
 static void hw_init(void);
+static void kernel_init(void);
 
 static void print_test(void);
 static void timer_test(void);
+
+void user_task_0(void);
+void user_task_1(void);
+void user_task_2(void);
 
 void main(void)
 {
@@ -63,4 +70,44 @@ static void timer_test(void)
 		debug_printf("current count : %u \n", hal_timer_get_1ms_counter());
 		delay(1000);
 	}
+}
+
+static void kernel_init(void)
+{
+	uint32_t task_id;
+
+	kernel_task_init();
+
+	task_id = kernel_task_create(user_task_0);
+	if (task_id == NOT_ENOUGH_TASK_NUM)
+		putstr("task_0 creation fail \n");
+
+	task_id = kernel_task_create(user_task_1);
+	if (task_id == NOT_ENOUGH_TASK_NUM)
+		putstr("task_1 creation fail \n");
+
+	task_id = kernel_task_create(user_task_2);
+	if (task_id == NOT_ENOUGH_TASK_NUM)
+		putstr("task_2 creation fail \n");
+}
+
+void user_task_0(void)
+{
+	debug_printf("User Task #0 \n");
+
+	while (true) ;
+}
+
+void user_task_1(void)
+{
+	debug_printf("User Task #1 \n");
+
+	while (true) ;
+}
+
+void user_task_2(void)
+{
+	debug_printf("User Task #2 \n");
+
+	while (true) ;
 }
