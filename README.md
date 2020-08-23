@@ -5,5 +5,5 @@ make Real-Time OS
 QEMU (ARM RealView PB-A8)
 
 # Develop
-OS: Linux Mint 20
+OS: Linux Mint 20 </br>
 Compiler: ARM-GCC
