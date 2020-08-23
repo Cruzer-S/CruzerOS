@@ -9,6 +9,7 @@
 #include "stdlib.h"
 
 #include "kernel.h"
+#include "event.h"
 
 static void hw_init(void);
 static void kernel_init(void);
@@ -79,6 +80,7 @@ static void kernel_init(void)
 	uint32_t task_id;
 
 	kernel_task_init();
+	kernel_event_flag_init();
 
 	task_id = kernel_task_create(user_task_0);
 	if (task_id == NOT_ENOUGH_TASK_NUM)
@@ -102,6 +104,21 @@ void user_task_0(void)
 	debug_printf("User Task #0 SP=0x%x\n", &local);
 	while (true)
 	{
+		kernel_event_flag_t handle_event 
+			= kernel_wait_events (kernel_event_flag_uart_in | kernel_event_flag_cmd_out);
+
+		switch (handle_event)
+		{
+		case kernel_event_flag_uart_in:
+			debug_printf("\nEvent handled \n");
+			kernel_send_events(kernel_event_flag_cmd_in);
+			break;
+
+		case kernel_event_flag_cmd_out:
+			debug_printf("\nCmd Out event by Task 01 \n");
+			break;
+		}
+
 		kernel_yield();
 	}
 }
@@ -113,6 +130,16 @@ void user_task_1(void)
 	debug_printf("User Task #0 SP=0x%x\n", &local);
 	while (true)
 	{
+		kernel_event_flag_t handle_event 
+			= kernel_wait_events(kernel_event_flag_cmd_in);
+
+		switch (handle_event)
+		{
+		case kernel_event_flag_cmd_in:
+			debug_printf("\nEvent handled by Task01 \n");
+			break;
+		}
+
 		kernel_yield();
 	}
 }

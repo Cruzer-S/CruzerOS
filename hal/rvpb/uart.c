@@ -1,7 +1,10 @@
 #include "stdint.h"
+#include "stdbool.h"
 #include "uart.h"
 #include "hal_uart.h"
 #include "hal_interrupt.h"
+
+#include "kernel.h"
 
 extern volatile PL011_t* uart;
 
@@ -48,5 +51,12 @@ static void interrupt_handler(void)
 {
 	uint8_t ch = hal_uart_get_char();
 	hal_uart_put_char(ch);
+
+	kernel_send_events(kernel_event_flag_uart_in | kernel_event_flag_cmd_in);
+
+	if (ch == 'X')
+	{
+		kernel_send_events(kernel_event_flag_cmd_out);
+	}
 }
 
