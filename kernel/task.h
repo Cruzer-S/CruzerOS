@@ -4,6 +4,7 @@
 #include "MemoryMap.h"
 
 #define NOT_ENOUGH_TASK_NUM 0XFFFFFFFF
+
 #define USR_TASK_STACK_SIZE 0x100000
 #define MAX_TASK_NUM		(TASK_STACK_SIZE / USR_TASK_STACK_SIZE)
 
@@ -22,7 +23,10 @@ typedef struct kernel_tcb_t
 
 typedef void (*kernel_task_func_t)(void);
 
-void kernel_task_init(void);
-uint32_t kernel_task_create(kernel_task_func_t start_func);
+void		kernel_task_init(void);
+void		kernel_task_start(void);
+uint32_t	kernel_task_create(kernel_task_func_t start_func);
+void		kernel_task_scheduler(void);
+void		kernel_task_context_switching(void);
 
 #endif
