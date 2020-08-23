@@ -1,4 +1,4 @@
-# Cruzeros
+# CruzerOS
 make Real-Time OS
 
 # Environment
