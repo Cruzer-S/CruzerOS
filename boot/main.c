@@ -7,9 +7,11 @@
 
 #include "stdio.h"
 #include "stdlib.h"
+#include "memio.h"
 
 #include "kernel.h"
 #include "event.h"
+#include "message.h"
 
 static void hw_init(void);
 static void kernel_init(void);
@@ -68,7 +70,7 @@ static void print_test(void)
 
 static void timer_test(void)
 {
-	for (uint32_t i = 0; i < 5; i++)
+	for (uint32_t i = 0; i < 1; i++)
 	{
 		debug_printf("current count : %u \n", hal_timer_get_1ms_counter());
 		delay(1000);
@@ -102,16 +104,38 @@ void user_task_0(void)
 	uint32_t local = 0;
 
 	debug_printf("User Task #0 SP=0x%x\n", &local);
+
+	uint8_t cmd_buf[16];
+	uint32_t cmd_buf_idx = 0;
+	uint8_t uart_ch;
+
 	while (true)
 	{
 		kernel_event_flag_t handle_event 
-			= kernel_wait_events (kernel_event_flag_uart_in | kernel_event_flag_cmd_out);
+			= kernel_wait_events (kernel_event_flag_uart_in);
 
 		switch (handle_event)
 		{
 		case kernel_event_flag_uart_in:
-			debug_printf("\nEvent handled \n");
-			kernel_send_events(kernel_event_flag_cmd_in);
+			kernel_receive_message(kernel_message_task_00, &uart_ch, 1);
+			if (uart_ch == '\r')
+			{
+				cmd_buf[cmd_buf_idx] = '\0';
+
+				kernel_send_message(kernel_message_task_01, &cmd_buf_idx, 1);
+				kernel_send_message(kernel_message_task_01, cmd_buf, cmd_buf_idx);
+
+				kernel_send_events(kernel_event_flag_cmd_in);
+
+				cmd_buf_idx = 0;
+			} else {
+				cmd_buf[cmd_buf_idx] = uart_ch;
+				cmd_buf_idx++;
+				cmd_buf_idx %= 16;
+
+				hal_uart_put_char(uart_ch);
+			}
+
 			break;
 
 		case kernel_event_flag_cmd_out:
@@ -128,6 +152,10 @@ void user_task_1(void)
 	uint32_t local = 0;
 
 	debug_printf("User Task #0 SP=0x%x\n", &local);
+
+	uint8_t cmd_len = 0;
+	uint8_t cmd[16] = { 0 };
+
 	while (true)
 	{
 		kernel_event_flag_t handle_event 
@@ -136,7 +164,12 @@ void user_task_1(void)
 		switch (handle_event)
 		{
 		case kernel_event_flag_cmd_in:
-			debug_printf("\nEvent handled by Task01 \n");
+			memclr(cmd, 16);
+
+			kernel_receive_message(kernel_message_task_01, &cmd_len, 1);
+			kernel_receive_message(kernel_message_task_01, &cmd, cmd_len);
+
+			debug_printf("Receive Command: %s \n", cmd);
 			break;
 		}
 

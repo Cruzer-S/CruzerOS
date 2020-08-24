@@ -5,6 +5,7 @@
 #include "hal_interrupt.h"
 
 #include "kernel.h"
+#include "message.h"
 
 extern volatile PL011_t* uart;
 
@@ -26,7 +27,8 @@ void hal_uart_init(void)
 
 void hal_uart_put_char(uint8_t ch)
 {
-    while(uart->uartfr.bits.TXFF);
+    while(uart->uartfr.bits.TXFF) ;
+
     uart->uartdr.all = (ch & 0xFF);
 }
 
@@ -34,7 +36,7 @@ uint8_t hal_uart_get_char(void)
 {
 	uint32_t data;
 
-	while (uart->uartfr.bits.RXFE);
+	while (uart->uartfr.bits.RXFE) ;
 
 	data = uart->uartdr.all;
 
@@ -50,13 +52,8 @@ uint8_t hal_uart_get_char(void)
 static void interrupt_handler(void)
 {
 	uint8_t ch = hal_uart_get_char();
-	hal_uart_put_char(ch);
+	// hal_uart_put_char(ch);
 
-	kernel_send_events(kernel_event_flag_uart_in | kernel_event_flag_cmd_in);
-
-	if (ch == 'X')
-	{
-		kernel_send_events(kernel_event_flag_cmd_out);
-	}
+	kernel_send_message(kernel_message_task_00, &ch, 1);
+	kernel_send_events(kernel_event_flag_uart_in);
 }
-
