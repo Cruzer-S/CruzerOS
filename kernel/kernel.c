@@ -81,3 +81,34 @@ uint32_t kernel_receive_message(kernel_message_t name, void *out_data, uint32_t 
 
 	return count;
 }
+
+void kernel_lock_sem(void)
+{
+	while (kernel_sem_test() == false)
+		kernel_yield();
+}
+
+void kernel_unlock_sem(void)
+{
+	kernel_sem_release();
+}
+
+void kernel_lock_mutex(void)
+{
+	while (true)
+	{
+		uint32_t current_task_id = kernel_task_get_current_task_id();
+		if (kernel_mutex_lock(current_task_id) == false)
+			kernel_yield();
+		else
+			break;
+	}
+}
+
+void kernel_unlock_mutex(void)
+{
+	uint32_t current_task_id = kernel_task_get_current_task_id();
+
+	if (kernel_mutex_unlock(current_task_id) == false)
+		return kernel_yield();
+}

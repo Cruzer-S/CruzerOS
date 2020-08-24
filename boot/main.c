@@ -13,6 +13,9 @@
 #include "event.h"
 #include "message.h"
 
+static uint32_t shared_value;
+static void test_critical_section(uint32_t p, uint32_t task_id);
+
 static void hw_init(void);
 static void kernel_init(void);
 
@@ -83,6 +86,7 @@ static void kernel_init(void)
 
 	kernel_task_init();
 	kernel_event_flag_init();
+	kernel_sem_init(1);
 
 	task_id = kernel_task_create(user_task_0);
 	if (task_id == NOT_ENOUGH_TASK_NUM)
@@ -112,7 +116,7 @@ void user_task_0(void)
 	while (true)
 	{
 		kernel_event_flag_t handle_event 
-			= kernel_wait_events (kernel_event_flag_uart_in);
+			= kernel_wait_events (kernel_event_flag_uart_in | kernel_event_flag_cmd_out);
 
 		switch (handle_event)
 		{
@@ -139,7 +143,7 @@ void user_task_0(void)
 			break;
 
 		case kernel_event_flag_cmd_out:
-			debug_printf("\nCmd Out event by Task 01 \n");
+			test_critical_section(5, 0);
 			break;
 		}
 
@@ -159,7 +163,7 @@ void user_task_1(void)
 	while (true)
 	{
 		kernel_event_flag_t handle_event 
-			= kernel_wait_events(kernel_event_flag_cmd_in);
+			= kernel_wait_events(kernel_event_flag_cmd_in | kernel_event_flag_unlock);
 
 		switch (handle_event)
 		{
@@ -170,6 +174,10 @@ void user_task_1(void)
 			kernel_receive_message(kernel_message_task_01, &cmd, cmd_len);
 
 			debug_printf("Receive Command: %s \n", cmd);
+			break;
+
+		case kernel_event_flag_unlock:
+			kernel_unlock_mutex();
 			break;
 		}
 
@@ -184,6 +192,26 @@ void user_task_2(void)
 	debug_printf("User Task #0 SP=0x%x\n", &local);
 	while (true)
 	{
+		test_critical_section(3, 2);
 		kernel_yield();
 	}
+}
+
+static void test_critical_section(uint32_t p, uint32_t task_id)
+{
+	// kernel_lock_sem();
+	kernel_lock_mutex();
+
+	debug_printf("User Task #%u send = %u \n", task_id, p);
+	shared_value = p;
+
+	kernel_yield();
+
+	delay(1000);
+
+	debug_printf("User Task #%u shared value = %u \n", task_id, shared_value);
+
+	kernel_unlock_mutex();
+
+	// kernel_unlock_sem();
 }

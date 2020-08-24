@@ -114,3 +114,7 @@ static kernel_tcb_t *scheduler_round_robin_algorithm(void)
 	return &task_list[current_tcb_index];
 }
 
+uint32_t kernel_task_get_current_task_id(void)
+{
+	return current_tcb_index;
+}

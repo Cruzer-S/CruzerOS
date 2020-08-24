@@ -6,7 +6,7 @@ typedef enum kernel_event_flag_t
 	kernel_event_flag_uart_in		= 0x00000001,
 	kernel_event_flag_cmd_in		= 0x00000002,
 	kernel_event_flag_cmd_out		= 0x00000004,
-	kernel_event_flag_reserved_03	= 0x00000008,
+	kernel_event_flag_unlock		= 0x00000008,
 	kernel_event_flag_reserved_04	= 0x00000010,
 	kernel_event_flag_reserved_05	= 0x00000020,
 	kernel_event_flag_reserved_06	= 0x00000040,
