@@ -1,0 +1,4 @@
+1.	Embedded application design using a real-time OS
+	link: https://dl.acm.org/doi/pdf/10.1145/309847.310566
+
+2.	
