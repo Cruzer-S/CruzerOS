@@ -1,4 +1,11 @@
 1.	Embedded application design using a real-time OS
 	link: https://dl.acm.org/doi/pdf/10.1145/309847.310566
 
-2.	
+2.	'Task'
+	link: http://terms.tta.or.kr/main.do
+	link: https://dictionary.cambridge.org/dictionary/english-korean/task
+
+3.	QEMU 
+	https://wiki.qemu.org/Main_Page
+
+4.	임베디드 컴퓨터
