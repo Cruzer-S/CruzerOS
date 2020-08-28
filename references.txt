@@ -1,0 +1,13 @@
+1.	Embedded application design using a real-time OS
+	link: https://dl.acm.org/doi/pdf/10.1145/309847.310566
+	D. Stepner, N. Rajan and D. Hui, "Embedded application design using a real-time OS," Proceedings 1999 Design Automation Conference (Cat. No. 99CH36361), New Orleans, LA, USA, 1999, pp. 151-156, doi: 10.1109/DAC.1999.781301.
+
+2.	'Task'
+	link: http://terms.tta.or.kr/main.do
+	link: https://dictionary.cambridge.org/dictionary/english-korean/task
+
+3.	QEMU 
+	https://wiki.qemu.org/Main_Page
+
+4.	임베디드 컴퓨터
+	컴퓨터 구조 및 설계 - 하드웨어/소프트웨어 인터페이스
