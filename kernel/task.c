@@ -86,7 +86,7 @@ static __attribute__ ((naked)) void save_context(void)
 	__asm__ ("MRS	r0, cpsr");
 	__asm__ ("PUSH {r0}");
 
-	// save current task tsack pointer into the current TCB
+	// save current task stack pointer into the current TCB
 	__asm__ ("LDR	r0, =current_tcb");
 	__asm__ ("LDR	r0, [r0]");
 	__asm__ ("STMIA r0!, {sp}");
